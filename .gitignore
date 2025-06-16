@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# IDE
+.idea/
+.vscode/
+
+# Env
+.venv/
+.env
+
+# Hình ảnh tạm
+*.jpg
+temp_images/
