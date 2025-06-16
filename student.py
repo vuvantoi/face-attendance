@@ -20,7 +20,7 @@ def run_student(root_login, user_id):
             conn = connect_db()
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT s.name, u.username, c.class_name
+                SELECT s.student_id, s.name, u.username, c.class_name
                 FROM students s
                 JOIN users u ON s.user_id = u.user_id
                 JOIN classes c ON s.class_id = c.class_id
@@ -30,7 +30,8 @@ def run_student(root_login, user_id):
             cursor.close()
             conn.close()
             if result:
-                name, username, class_name = result
+                student_id, name, username, class_name = result
+                lbl_id_value.config(text=student_id)
                 lbl_name_value.config(text=name)
                 lbl_username_value.config(text=username)
                 lbl_class_value.config(text=class_name)
@@ -124,17 +125,21 @@ def run_student(root_login, user_id):
     frame_info = tk.Frame(tab_info, bg="white", pady=10)
     frame_info.pack()
 
-    tk.Label(frame_info, text="Tên sinh viên:", bg="white", font=("Helvetica", 11)).grid(row=0, column=0, sticky="e", padx=10, pady=5)
-    lbl_name_value = tk.Label(frame_info, text="", bg="white", font=("Helvetica", 11, "bold"))
-    lbl_name_value.grid(row=0, column=1, sticky="w")
+    tk.Label(frame_info, text="Mã sinh viên:", bg="white", font=("Helvetica", 11)).grid(row=0, column=0, sticky="e", padx=10, pady=5)
+    lbl_id_value = tk.Label(frame_info, text="", bg="white", font=("Helvetica", 11, "bold"))
+    lbl_id_value.grid(row=0, column=1, sticky="w")
 
-    tk.Label(frame_info, text="Tên đăng nhập:", bg="white", font=("Helvetica", 11)).grid(row=1, column=0, sticky="e", padx=10, pady=5)
+    tk.Label(frame_info, text="Tên sinh viên:", bg="white", font=("Helvetica", 11)).grid(row=1, column=0, sticky="e", padx=10, pady=5)
+    lbl_name_value = tk.Label(frame_info, text="", bg="white", font=("Helvetica", 11, "bold"))
+    lbl_name_value.grid(row=1, column=1, sticky="w")
+
+    tk.Label(frame_info, text="Tên đăng nhập:", bg="white", font=("Helvetica", 11)).grid(row=2, column=0, sticky="e", padx=10, pady=5)
     lbl_username_value = tk.Label(frame_info, text="", bg="white", font=("Helvetica", 11, "bold"))
-    lbl_username_value.grid(row=1, column=1, sticky="w")
-    tk.Label(frame_info, text="Lớp học:", bg="white", font=("Helvetica", 11)).grid(row=2, column=0, sticky="e", padx=10,
-                                                                                   pady=5)
+    lbl_username_value.grid(row=2, column=1, sticky="w")
+
+    tk.Label(frame_info, text="Lớp học:", bg="white", font=("Helvetica", 11)).grid(row=3, column=0, sticky="e", padx=10, pady=5)
     lbl_class_value = tk.Label(frame_info, text="", bg="white", font=("Helvetica", 11, "bold"))
-    lbl_class_value.grid(row=2, column=1, sticky="w")
+    lbl_class_value.grid(row=3, column=1, sticky="w")
 
     # Đổi mật khẩu
     frame_pw = tk.LabelFrame(tab_info, text="Đổi mật khẩu", bg="white", font=("Helvetica", 12, "bold"), fg="blue", padx=10, pady=10)
@@ -194,4 +199,3 @@ def run_student(root_login, user_id):
     load_student_info()
     load_attendance()
     root.mainloop()
-

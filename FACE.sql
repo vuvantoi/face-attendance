@@ -75,11 +75,29 @@ ALTER TABLE students ADD (
     face_image      BLOB,  -- ảnh khuôn mặt .jpg dùng để xem lại
     image_encoding  CLOB   
 );
+
+
+CREATE SEQUENCE seq_student_id
+START WITH 20250001
+INCREMENT BY 1
+NOCACHE
+NOCYCLE;
+
+CREATE OR REPLACE TRIGGER trg_student_id
+BEFORE INSERT ON students
+FOR EACH ROW
+BEGIN
+    SELECT seq_student_id.NEXTVAL INTO :NEW.student_id FROM dual;
+END;
+/
+
 SELECT column_name, data_type, data_length
 FROM user_tab_columns
 WHERE table_name = 'STUDENTS';
 -- Sequence cho attendance_id
 CREATE SEQUENCE seq_attendance_id START WITH 1 INCREMENT BY 1;
+
+
 
 -- Bảng ATTENDANCE
 CREATE TABLE attendance (
