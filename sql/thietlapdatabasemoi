@@ -1,0 +1,126 @@
+-- ================================
+-- 1. TẠO SEQUENCE VÀ BẢNG USERS
+-- ================================
+CREATE SEQUENCE seq_user_id START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE users (
+    user_id NUMBER PRIMARY KEY,
+    username VARCHAR2(50) UNIQUE NOT NULL,
+    password VARCHAR2(100) NOT NULL,
+    role VARCHAR2(20) CHECK (role IN ('admin', 'teacher', 'student'))
+);
+
+CREATE OR REPLACE TRIGGER trg_user_id
+BEFORE INSERT ON users
+FOR EACH ROW
+BEGIN
+    SELECT seq_user_id.NEXTVAL INTO :NEW.user_id FROM dual;
+END;
+/
+
+-- ================================
+-- 2. TẠO BẢNG GIÁO VIÊN (TEACHERS)
+-- ================================
+CREATE SEQUENCE seq_teacher_id START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE teachers (
+    teacher_id NUMBER PRIMARY KEY,
+    name VARCHAR2(100) NOT NULL,
+    user_id NUMBER UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE OR REPLACE TRIGGER trg_teacher_id
+BEFORE INSERT ON teachers
+FOR EACH ROW
+BEGIN
+    SELECT seq_teacher_id.NEXTVAL INTO :NEW.teacher_id FROM dual;
+END;
+/
+
+-- ================================
+-- 3. TẠO BẢNG LỚP HỌC (CLASSES)
+-- ================================
+CREATE SEQUENCE seq_class_id START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+CREATE TABLE classes (
+    class_id NUMBER PRIMARY KEY,
+    class_name VARCHAR2(100) NOT NULL,
+    teacher_id NUMBER,
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id)
+);
+
+CREATE OR REPLACE TRIGGER trg_class_id
+BEFORE INSERT ON classes
+FOR EACH ROW
+BEGIN
+    SELECT seq_class_id.NEXTVAL INTO :NEW.class_id FROM dual;
+END;
+/
+
+-- ================================
+-- 4. TẠO BẢNG SINH VIÊN (STUDENTS)
+-- ================================
+CREATE SEQUENCE seq_student_id START WITH 20250001 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+CREATE TABLE students (
+    student_id NUMBER PRIMARY KEY,
+    name VARCHAR2(100) NOT NULL,
+    face_image BLOB,               -- Ảnh khuôn mặt dùng để xem lại
+    image_encoding CLOB,           -- Dữ liệu mã hóa khuôn mặt
+    user_id NUMBER UNIQUE,
+    class_id NUMBER,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (class_id) REFERENCES classes(class_id)
+);
+
+CREATE OR REPLACE TRIGGER trg_student_id
+BEFORE INSERT ON students
+FOR EACH ROW
+BEGIN
+    SELECT seq_student_id.NEXTVAL INTO :NEW.student_id FROM dual;
+END;
+/
+
+-- ================================
+-- 5. TẠO BẢNG ĐIỂM DANH (ATTENDANCE)
+-- ================================
+CREATE SEQUENCE seq_attendance_id START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE attendance (
+    attendance_id NUMBER PRIMARY KEY,
+    student_id NUMBER,
+    checkin_time TIMESTAMP DEFAULT SYSTIMESTAMP,
+    status VARCHAR2(20),
+    photo_captured BLOB,
+    FOREIGN KEY (student_id) REFERENCES students(student_id)
+);
+
+ALTER TABLE attendance ADD CONSTRAINT chk_attendance_status
+CHECK (status IN ('Có mặt', 'Vắng', 'Muộn'));
+
+CREATE OR REPLACE TRIGGER trg_attendance_id
+BEFORE INSERT ON attendance
+FOR EACH ROW
+BEGIN
+    SELECT seq_attendance_id.NEXTVAL INTO :NEW.attendance_id FROM dual;
+END;
+/
+
+-- ================================
+-- 6. GỢI Ý: KIỂM TRA CẤU TRÚC BẢNG
+-- ================================
+-- Xem cấu trúc cột bảng STUDENTS
+-- SELECT column_name, data_type, data_length FROM user_tab_columns WHERE table_name = 'STUDENTS';
+
+-- Xem cấu trúc cột bảng ATTENDANCE
+-- SELECT column_name, data_type, data_length FROM user_tab_columns WHERE table_name = 'ATTENDANCE';
+
+-- ================================
+-- 7. GỢI Ý: CÂU LỆNH XEM DỮ LIỆU
+-- ================================
+-- SELECT * FROM users;
+-- SELECT * FROM teachers;
+-- SELECT * FROM classes;
+-- SELECT * FROM students;
+-- SELECT * FROM attendance;
